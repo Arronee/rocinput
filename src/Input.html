@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>输入框</title>
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="../bower_components/vue/dist/vue.js"></script>
+
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+
+</head>
+<body>
+<br><br><br>
+
+<div class="container">
+    <div class="row">
+
+        <div id="tags" class="col-lg-4" style="border:1px solid gainsboro;padding: 0px">
+
+            <!--显示的控件-->
+            <span v-for="(value,index) in message " v-bind:id="'span_'+index"
+                  style="background-color: #00b3ee ;margin-left: 2px;height: 20px;display:inline-block">
+                    {{value}}
+                    <input type="button" value="x" style="background-color:inherit;border: none;height: inherit;font-size: 10px;text-align: center"
+                           v-on:click="deleteClick(index)" v-on:mouseover="hightLight(index)" v-on:mouseout="unhightLight(index)">
+                </span><br>
+
+            <!--输入框-->
+            <input type="text" placeholder="请输入症状" id="input" style="border: 0px;outline: none"
+                   v-on:keyup.enter="add" v-on:keyup.delete="remove" v-on:input ="inputFunc">
+
+            <!--提示框-->
+            <ul v-if="message3.length !=0" class=" dropdown-menu" role="menu" aria-labelledby="dropdownMenu1"
+                style=" display: block;" id="ul-id">
+
+                <li v-for="(value,index) in message3" role="presentation" v-on:click="dismiss(index)">
+                    <a href="#" role="menuitem" tabindex="-1" >{{value}}</a>
+
+                </li>
+
+
+            </ul>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+</body>
+
+<script type="text/javascript">
+
+    var state =0;//删除状态的记录
+    var result = new  Vue({
+                el:'#tags',
+                data:{
+                    message:["1","2"],
+                    message3:[]
+                },
+                methods:{
+
+                    //键盘回车的事件
+                    add:function () {
+                        var value = document.getElementById("input").value
+                        if(value.length == 0) return;
+                        this.message.push(value);
+                        $("#input").val("");
+
+                        this.message3.splice(0,this.message3.length);
+
+                    },
+
+                    //键盘删除的点击事件
+                    remove:function () {
+                        var span_id = this.message.length-1;
+
+                        if (document.getElementById("input").value.length >0){
+
+
+                        }else {
+                            if (state==0) {
+                                state--;
+                                //改变标签的状态
+                                $('#span_'+span_id).css('background-color','red');
+
+                                this.message3.splice(0,this.message3.length);
+
+                                return;
+                            }
+
+                            if(state<0){
+                                state++;
+                                this.message.pop();
+
+                            }
+
+                        }
+
+                    },
+
+                    //删除按钮的点击事件
+                    deleteClick:function (index) {
+                        this.message.splice(index,1);
+                        if (state<0){
+                            state++;
+                        }
+
+                    },
+
+                    //输入框状态的监听
+                    inputFunc:function () {
+
+                        var span_id = this.message.length-1;
+                        $('#span_'+span_id).css('background-color','#00b3ee');
+
+                        console.log(document.getElementById("input").value);
+
+                        if (state<0){
+                            state++;
+                        }
+
+                        this.message3.push(document.getElementById("input").value);
+
+                        var heigh= $("#tags").css("height");
+                        console.log(heigh);
+                        $("#ul-id").css("top",heigh);
+
+                        if ($("#ul-id").css("display")== "none"){
+                            $("#ul-id").toggle();
+                        }
+
+                    },
+
+                    dismiss:function (index) {
+
+                        $("#ul-id").toggle();
+                        $("#input").val("");
+
+                        this.message.push(this.message3[index]);
+                        this.message3.splice(0,this.message3.length);
+                    },
+
+                    //鼠标移动上的事件
+                    hightLight:function (index) {
+                        $('#span_'+index).css('background-color','red');
+                    },
+                    //鼠标移出的事件
+                    unhightLight:function (index) {
+                        $('#span_'+index).css('background-color','#00b3ee');
+
+                    }
+
+                }
+            }
+    );
+
+
+</script>
+</html>
